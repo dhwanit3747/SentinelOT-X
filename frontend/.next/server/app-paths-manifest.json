@@ -1,0 +1,9 @@
+{
+  "/page": "app/page.js",
+  "/compliance/page": "app/compliance/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/soc/page": "app/soc/page.js",
+  "/logic-diff/page": "app/logic-diff/page.js",
+  "/digital-twin/page": "app/digital-twin/page.js",
+  "/audit/page": "app/audit/page.js"
+}
