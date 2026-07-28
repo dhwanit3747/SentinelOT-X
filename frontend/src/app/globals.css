@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Global Reset ─── */
+/* ─── Global Reset & Overflow Protection ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -44,6 +44,7 @@ html, body {
   color: var(--text-main) !important;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -78,6 +79,107 @@ html, body {
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
 
+/* ─── Responsive Media Queries ─── */
+
+/* ── Desktop: hide hamburger button ── */
+@media (min-width: 1025px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
+}
+
+/* Desktop & Tablet Layout Adjustments (< 1024px) */
+@media (max-width: 1024px) {
+  .responsive-grid-2col,
+  .responsive-grid-3col,
+  .reports-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sidebar-container {
+    position: fixed !important;
+    left: -280px;
+    top: 64px;
+    z-index: 99;
+    height: calc(100vh - 64px);
+    transition: left 0.25s ease-in-out;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  }
+
+  .sidebar-container.open {
+    left: 0 !important;
+  }
+
+  .main-content {
+    padding: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Mobile Devices (< 768px) */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0 12px !important;
+    gap: 8px !important;
+  }
+
+  .header-status-pills {
+    display: none !important;
+  }
+
+  .header-actions button span {
+    display: none !important;
+  }
+
+  .header-actions button {
+    padding: 6px 8px !important;
+  }
+
+  .main-content {
+    padding: 10px !important;
+  }
+
+  .diff-view-container {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fix SVG diagram overflow on mobile */
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prevent long text strings from breaking layout */
+  * {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Ensure cards don't overflow on small screens */
+  [style*="minWidth: 300"],
+  [style*="min-width: 300"] {
+    min-width: 0 !important;
+  }
+
+  /* Monospace text scaling on mobile */
+  [style*="fontFamily: 'monospace'"],
+  [style*="font-family: monospace"] {
+    font-size: 11px;
+  }
+
+  /* Large metric numbers scale down */
+  [style*="fontSize: 28"],
+  [style*="fontSize: 36"],
+  [style*="fontSize: 32"] {
+    font-size: 22px !important;
+  }
+
+  h1 {
+    font-size: 16px !important;
+  }
+}
+
 /* ─── Print / Save to PDF Styles ─── */
 @media print {
   @page {
@@ -89,7 +191,8 @@ html, body {
   aside,
   nav,
   .no-print,
-  .presentation-bar {
+  .presentation-bar,
+  .mobile-menu-btn {
     display: none !important;
   }
 

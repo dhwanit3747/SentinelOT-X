@@ -111,7 +111,7 @@ export default function DigitalTwinReplay() {
       </div>
 
       {/* Main Grid: Interactive Schematic (Left 60%) + Educational Inspector (Right 40%) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 20 }}>
+      <div className="responsive-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 420px', gap: 20 }}>
 
         {/* Interactive Schematic Diagram */}
         <div style={{

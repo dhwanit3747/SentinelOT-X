@@ -78,7 +78,7 @@ export default function SOCAlertTriage() {
       </div>
 
       {/* Main Split Screen */}
-      <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 20 }}>
+      <div className="responsive-grid-2col" style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 20 }}>
 
         {/* Alert List Queue */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

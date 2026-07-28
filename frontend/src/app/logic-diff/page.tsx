@@ -106,7 +106,7 @@ export default function LogicDiffViewer() {
       </div>
 
       {/* ── SIDE-BY-SIDE CODE COMPARISON BOXES ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="responsive-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
         {/* Approved Version (Green) */}
         <div style={{ background: '#0F1623', border: '1px solid #39FF14', borderRadius: 14, padding: 18 }}>

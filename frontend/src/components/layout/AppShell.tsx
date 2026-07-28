@@ -15,6 +15,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [showWizard, setShowWizard] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
   const [userRole, setUserRole] = useState('Judge Mode');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -70,11 +71,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           onOpenGlossary={() => setShowGlossary(true)}
           onOpenWizard={() => setShowWizard(true)}
           userRole={userRole}
+          onToggleSidebar={() => setIsMobileSidebarOpen(v => !v)}
+          isSidebarOpen={isMobileSidebarOpen}
         />
 
-        <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
-          <Sidebar />
-          <main style={{ flex: 1, padding: 24, overflowY: 'auto', minWidth: 0 }}>
+        <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', position: 'relative' }}>
+          {/* Mobile Sidebar Overlay Backdrop */}
+          {isMobileSidebarOpen && (
+            <div
+              onClick={() => setIsMobileSidebarOpen(false)}
+              style={{
+                position: 'fixed', inset: 0, zIndex: 90,
+                background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
+              }}
+            />
+          )}
+
+          <Sidebar isOpen={isMobileSidebarOpen} onClose={() => setIsMobileSidebarOpen(false)} />
+
+          <main className="main-content" style={{ flex: 1, padding: 24, overflowY: 'auto', minWidth: 0, maxWidth: 1280, margin: '0 auto', width: '100%' }}>
             <PresentationModeBar onOpenCopilot={() => setIsCopilotOpen(true)} />
             {children}
           </main>
@@ -99,12 +114,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <div style={{
                 position: 'fixed', inset: 0, zIndex: 9999,
                 background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
               }}>
                 <div style={{
                   width: '100%', maxWidth: 640,
                   background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-                  borderRadius: 16, padding: 24,
+                  borderRadius: 16, padding: 20,
                   boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
                   color: 'var(--text-main)', maxHeight: '85vh', overflowY: 'auto',
                 }}>

@@ -8,7 +8,12 @@ import {
 } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
   const { socAlertCount, hasDrift } = useApp();
 
@@ -74,7 +79,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside style={{
+    <aside className={`sidebar-container ${isOpen ? 'open' : ''}`} style={{
       width: 256,
       minWidth: 256,
       background: 'var(--bg-header)',
@@ -105,7 +110,7 @@ export const Sidebar: React.FC = () => {
             const isDrift = item.badgeType === 'drift';
 
             return (
-              <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
+              <Link key={item.href} href={item.href} onClick={onClose} style={{ textDecoration: 'none' }}>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',

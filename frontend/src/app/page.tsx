@@ -217,7 +217,8 @@ export default function ExecutiveDashboard() {
       </div>
 
       {/* ── MIDDLE ROW: VISUAL ATTACK PATH & ANNOTATED RISK GRAPH ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      {/* ── ATTACK PATH & RISK TREND GRID ── */}
+      <div className="responsive-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
 
         {/* Visual Attack Surface Diagram */}
         <div style={cardStyle()}>

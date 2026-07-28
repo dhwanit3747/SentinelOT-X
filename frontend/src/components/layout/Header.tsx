@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Cpu, Bot, Activity, BookOpen, Moon, Sun, UserCheck } from 'lucide-react';
+import { Cpu, Bot, Activity, BookOpen, Moon, Sun, UserCheck, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   onToggleCopilot: () => void;
@@ -10,6 +10,8 @@ interface HeaderProps {
   onOpenGlossary: () => void;
   onOpenWizard: () => void;
   userRole: string;
+  onToggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,9 +19,11 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleLightMode, isLightMode,
   onOpenGlossary, onOpenWizard,
   userRole,
+  onToggleSidebar,
+  isSidebarOpen,
 }) => {
   return (
-    <header style={{
+    <header className="header-container" style={{
       height: 64,
       borderBottom: '1px solid var(--border-color)',
       background: 'var(--bg-header)',
@@ -27,15 +31,32 @@ export const Header: React.FC<HeaderProps> = ({
       WebkitBackdropFilter: 'blur(16px)',
       position: 'sticky',
       top: 0,
-      zIndex: 40,
+      zIndex: 100,
       padding: '0 24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 12,
     }}>
-      {/* ── Left: Brand + Status ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, minWidth: 0 }}>
+      {/* ── Left: Mobile Hamburger + Brand + Status ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+        {/* Mobile Hamburger Button */}
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            className="mobile-menu-btn"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: 8,
+              background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)',
+              color: 'var(--text-main)', cursor: 'pointer', flexShrink: 0,
+            }}
+            title="Toggle Menu"
+          >
+            {isSidebarOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
+          </button>
+        )}
+
         {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <div style={{
@@ -59,8 +80,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Live status pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 16, borderLeft: '1px solid var(--border-color)' }}>
+        {/* Live status pills (Hidden on small mobile) */}
+        <div className="header-status-pills" style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 16, borderLeft: '1px solid var(--border-color)' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
@@ -81,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* ── Right: Action Buttons ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         {/* Role / Wizard trigger */}
         <button
           onClick={onOpenWizard}
@@ -94,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           <UserCheck style={{ width: 13, height: 13 }} />
-          {userRole}
+          <span>{userRole}</span>
         </button>
 
         {/* Light/Dark toggle */}
@@ -113,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
             ? <Sun style={{ width: 13, height: 13, color: '#D97706' }} />
             : <Moon style={{ width: 13, height: 13, color: 'var(--accent-cyan)' }} />
           }
-          {isLightMode ? 'LIGHT' : 'DARK'}
+          <span>{isLightMode ? 'LIGHT' : 'DARK'}</span>
         </button>
 
         {/* Dictionary */}
@@ -128,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           <BookOpen style={{ width: 13, height: 13 }} />
-          DICTIONARY
+          <span>DICTIONARY</span>
         </button>
 
         {/* AI Copilot */}
@@ -144,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           <Bot style={{ width: 14, height: 14 }} />
-          AI COPILOT
+          <span>AI COPILOT</span>
         </button>
       </div>
     </header>
