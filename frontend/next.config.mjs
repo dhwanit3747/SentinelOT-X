@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
+const isProd = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig = {
   reactStrictMode: true,
   output: 'export',
-  basePath: '/SentinelOT-X',
-  assetPrefix: '/SentinelOT-X/',
+  basePath: isProd ? '/SentinelOT-X' : '',
+  assetPrefix: isProd ? '/SentinelOT-X/' : '',
   images: {
     unoptimized: true,
   },
+  trailingSlash: false,
 };
 
 export default nextConfig;
