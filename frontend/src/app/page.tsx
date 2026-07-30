@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   ShieldAlert, DollarSign, AlertTriangle,
   Bot, Activity, Cpu, CheckCircle2, ChevronRight, Network, HelpCircle, BookOpen, RotateCcw, AlertOctagon, Flame
@@ -143,12 +144,12 @@ export default function ExecutiveDashboard() {
               </div>
             )}
 
-            <a href="/logic-diff" style={{
+            <Link href="/logic-diff" style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px', borderRadius: 10,
               background: 'rgba(255,255,255,0.06)', color: C.text, border: `1px solid ${C.border}`, fontWeight: 700, fontSize: 12, textDecoration: 'none'
             }}>
               SEE WHAT CHANGED IN CODE <ChevronRight style={{ width: 14, height: 14 }} />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

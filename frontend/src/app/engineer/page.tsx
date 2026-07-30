@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
 import { Cpu, CheckCircle2, AlertTriangle, GitCompare, Box } from 'lucide-react';
 
 const machines = [
@@ -139,7 +140,7 @@ export default function EngineerFleetView() {
               {/* Action buttons */}
               <div style={{ display: 'flex', gap: 8 }}>
                 {isCompromised ? (
-                  <a
+                  <Link
                     href="/logic-diff"
                     style={{
                       flex: 1, padding: '9px', borderRadius: 8, background: '#FF0055', color: '#FFF',
@@ -148,14 +149,14 @@ export default function EngineerFleetView() {
                     }}
                   >
                     <GitCompare style={{ width: 14, height: 14 }} /> COMPARE CODE
-                  </a>
+                  </Link>
                 ) : (
                   <div style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'rgba(57,255,20,0.1)', color: '#39FF14', fontSize: 11, fontWeight: 700, textAlign: 'center' }}>
                     ✓ Code Verified Safe
                   </div>
                 )}
 
-                <a
+                <Link
                   href="/digital-twin"
                   style={{
                     padding: '9px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', color: '#CBD5E1',
@@ -164,7 +165,7 @@ export default function EngineerFleetView() {
                   }}
                 >
                   <Box style={{ width: 14, height: 14, color: '#00F0FF' }} /> TWIN
-                </a>
+                </Link>
               </div>
             </div>
           );

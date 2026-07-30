@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
+const isGithubPages = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig = {
   reactStrictMode: true,
   output: 'export',
-  basePath: '/SentinelOT-X',
-  assetPrefix: '/SentinelOT-X/',
+  basePath: isGithubPages ? '/SentinelOT-X' : '',
+  assetPrefix: isGithubPages ? '/SentinelOT-X/' : '',
   images: {
     unoptimized: true,
   },

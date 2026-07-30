@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -36,6 +36,11 @@ jobs:
           cd frontend
           npm ci
           npm run build
+        env:
+          GITHUB_PAGES: "true"
+
+      - name: Add .nojekyll
+        run: touch ./frontend/out/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
