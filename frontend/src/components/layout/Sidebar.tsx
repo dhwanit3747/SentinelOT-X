@@ -14,7 +14,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
-  const pathname = usePathname();
+  const pathname = usePathname() || '/';
   const { socAlertCount, hasDrift } = useApp();
 
   const navItems = [
@@ -106,7 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
+            const normalizedPath = pathname.replace(/\/$/, '') || '/';
+            const normalizedHref = item.href.replace(/\/$/, '') || '/';
+            const active = normalizedPath === normalizedHref;
             const isDrift = item.badgeType === 'drift';
 
             return (
@@ -161,27 +163,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
 
       {/* Plant Safety Footer */}
       <div style={{ padding: '10px 14px' }}>
-        <div style={{
-          background: 'rgba(255,0,85,0.08)',
-          border: '1px solid rgba(255,0,85,0.30)',
-          padding: '10px 12px',
-          borderRadius: 10,
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <AlertOctagon style={{ width: 12, height: 12, color: 'var(--accent-red)', flexShrink: 0 }} />
-              PLANT STATUS
-            </span>
-            <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 800, color: 'var(--accent-red)' }}>
-              {hasDrift ? 'ATTACK' : 'SAFE'}
-            </span>
+        <Link href="/soc" style={{ textDecoration: 'none' }}>
+          <div style={{
+            background: 'rgba(255,0,85,0.08)',
+            border: '1px solid rgba(255,0,85,0.30)',
+            padding: '10px 12px',
+            borderRadius: 10,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                <AlertOctagon style={{ width: 12, height: 12, color: 'var(--accent-red)', flexShrink: 0 }} />
+                PLANT STATUS
+              </span>
+              <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 800, color: 'var(--accent-red)' }}>
+                {hasDrift ? 'ATTACK' : 'SAFE'}
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+              {hasDrift
+                ? '2 controllers have unapproved code. E-Stop disabled.'
+                : 'All controllers safe. Baseline verified.'}
+            </p>
           </div>
-          <p style={{ margin: 0, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-            {hasDrift
-              ? '2 controllers have unapproved code. E-Stop disabled.'
-              : 'All controllers safe. Baseline verified.'}
-          </p>
-        </div>
+        </Link>
       </div>
     </aside>
   );

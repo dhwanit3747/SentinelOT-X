@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
 import { Cpu, Bot, Activity, BookOpen, Moon, Sun, UserCheck, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
@@ -57,8 +58,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        {/* Brand (Clickable to Home) */}
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, textDecoration: 'none' }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
             background: 'rgba(0,240,255,0.10)',
@@ -78,26 +79,33 @@ export const Header: React.FC<HeaderProps> = ({
               SELF-EXPLAINING OT CYBERSECURITY PLATFORM
             </p>
           </div>
-        </div>
+        </Link>
 
-        {/* Live status pills (Hidden on small mobile) */}
+        {/* Live status pills (Clickable shortcuts to SOC & Machines) */}
         <div className="header-status-pills" style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 16, borderLeft: '1px solid var(--border-color)' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
-            border: '1px solid var(--border-color)', fontSize: 10, fontFamily: 'monospace',
-          }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-red)', display: 'inline-block', boxShadow: '0 0 6px var(--accent-red)' }} />
-            <span style={{ color: 'var(--accent-red)', fontWeight: 700 }}>2 MACHINES COMPROMISED</span>
-          </div>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
-            border: '1px solid var(--border-color)', fontSize: 10, fontFamily: 'monospace', color: 'var(--text-slate)',
-          }}>
-            <Activity style={{ width: 12, height: 12, color: 'var(--accent-cyan)' }} />
-            <span>4 FACTORY CONTROLLERS</span>
-          </div>
+          <Link href="/soc" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
+              border: '1px solid var(--border-color)', fontSize: 10, fontFamily: 'monospace',
+              transition: 'all 0.15s ease',
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-red)', display: 'inline-block', boxShadow: '0 0 6px var(--accent-red)' }} />
+              <span style={{ color: 'var(--accent-red)', fontWeight: 700 }}>2 MACHINES COMPROMISED</span>
+            </div>
+          </Link>
+
+          <Link href="/engineer" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
+              border: '1px solid var(--border-color)', fontSize: 10, fontFamily: 'monospace', color: 'var(--text-slate)',
+              transition: 'all 0.15s ease',
+            }}>
+              <Activity style={{ width: 12, height: 12, color: 'var(--accent-cyan)' }} />
+              <span>4 FACTORY CONTROLLERS</span>
+            </div>
+          </Link>
         </div>
       </div>
 
