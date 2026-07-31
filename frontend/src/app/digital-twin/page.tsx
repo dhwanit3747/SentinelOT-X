@@ -45,15 +45,19 @@ const equipmentNodes = [
   },
 ];
 
+import { useApp } from '@/lib/AppContext';
+
 export default function DigitalTwinReplay() {
   const [selectedNode, setSelectedNode] = useState(equipmentNodes[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [timeStep, setTimeStep] = useState(14);
-  const [overrideFixed, setOverrideFixed] = useState(false);
+  const { hasDrift, isRolledBack, executeGlobalRollback } = useApp();
 
-  const handleFix = () => {
-    setOverrideFixed(true);
+  const overrideFixed = !hasDrift || isRolledBack;
+
+  const handleFix = async () => {
+    await executeGlobalRollback('all');
     alert('SAFE OVERRIDE TRIGGERED: Digital Twin state reset to safe baseline!');
   };
 

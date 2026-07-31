@@ -34,20 +34,24 @@ const cardStyle = (extra: React.CSSProperties = {}): React.CSSProperties => ({
   ...extra,
 });
 
+import { useApp } from '@/lib/AppContext';
+
 export default function ExecutiveDashboard() {
   const [mounted, setMounted] = useState(false);
   const [hrs, setHrs] = useState(6.5);
   const rate = 145_000;
   const loss = hrs * rate;
-  const [rolledBack, setRolledBack] = useState(false);
+  const { hasDrift, isRolledBack, executeGlobalRollback } = useApp();
+
+  const rolledBack = !hasDrift || isRolledBack;
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleRollback = () => {
-    setRolledBack(true);
-    alert('SUCCESS: Approved PLC baseline restored! Emergency Stop re-engaged.');
+  const handleRollback = async () => {
+    await executeGlobalRollback('all');
+    alert('SUCCESS: Approved PLC baseline restored! Emergency Stop re-engaged across all fleet controllers.');
   };
 
   return (

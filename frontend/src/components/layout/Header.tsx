@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Cpu, Bot, Activity, BookOpen, Moon, Sun, UserCheck, Menu, X } from 'lucide-react';
+import { useApp } from '@/lib/AppContext';
 
 interface HeaderProps {
   onToggleCopilot: () => void;
@@ -23,6 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   isSidebarOpen,
 }) => {
+  const { hasDrift, isRolledBack } = useApp();
+  const isSafe = !hasDrift || isRolledBack;
   return (
     <header className="header-container" style={{
       height: 64,
@@ -87,11 +90,11 @@ export const Header: React.FC<HeaderProps> = ({
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6,
               background: 'var(--bg-card)', borderRadius: 50, padding: '4px 10px',
-              border: '1px solid var(--border-color)', fontSize: 10, fontFamily: 'monospace',
-              transition: 'all 0.15s ease',
+              border: `1px solid ${isSafe ? 'rgba(57,255,20,0.3)' : 'var(--border-color)'}`, fontSize: 10, fontFamily: 'monospace',
+              transition: 'all 0.3s ease',
             }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-red)', display: 'inline-block', boxShadow: '0 0 6px var(--accent-red)' }} />
-              <span style={{ color: 'var(--accent-red)', fontWeight: 700 }}>2 MACHINES COMPROMISED</span>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: isSafe ? 'var(--accent-green)' : 'var(--accent-red)', display: 'inline-block', boxShadow: isSafe ? '0 0 6px var(--accent-green)' : '0 0 6px var(--accent-red)' }} />
+              <span style={{ color: isSafe ? 'var(--accent-green)' : 'var(--accent-red)', fontWeight: 700 }}>{isSafe ? 'ALL SYSTEMS SAFE' : '2 MACHINES COMPROMISED'}</span>
             </div>
           </Link>
 

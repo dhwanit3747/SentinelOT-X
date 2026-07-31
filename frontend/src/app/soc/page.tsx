@@ -37,14 +37,19 @@ const alerts = [
 export default function SOCAlertTriage() {
   const [selectedAlert, setSelectedAlert] = useState(alerts[0]);
   const [resolved, setResolved] = useState<string[]>([]);
-  const { setSocAlertCount } = useApp();
+  const { setSocAlertCount, executeGlobalRollback, isRolledBack, hasDrift } = useApp();
 
-  const handleResolve = (id: string) => {
-    setResolved(prev => {
-      const next = prev.includes(id) ? prev : [...prev, id];
-      setSocAlertCount(alerts.length - next.length);
-      return next;
-    });
+  const isAllResolved = isRolledBack || !hasDrift;
+  const currentResolved = isAllResolved ? alerts.map(a => a.id) : resolved;
+
+  const handleResolve = async (id: string) => {
+    const next = resolved.includes(id) ? resolved : [...resolved, id];
+    const remaining = alerts.length - next.length;
+    setResolved(next);
+    setSocAlertCount(remaining);
+    if (remaining === 0) {
+      await executeGlobalRollback('all');
+    }
     alert(`✅ Alert ${id} resolved. Baseline restored & threat neutralised.`);
   };
 
@@ -83,12 +88,12 @@ export default function SOCAlertTriage() {
         {/* Alert List Queue */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ fontSize: 12, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Active Threat Events ({alerts.length - resolved.length})
+            Active Threat Events ({Math.max(0, alerts.length - currentResolved.length)})
           </div>
 
           {alerts.map((alt) => {
             const isSelected = selectedAlert.id === alt.id;
-            const isResolved = resolved.includes(alt.id);
+            const isResolved = currentResolved.includes(alt.id);
 
             return (
               <div

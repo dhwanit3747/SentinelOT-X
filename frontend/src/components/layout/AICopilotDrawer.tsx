@@ -19,10 +19,18 @@ const PRESETS = [
   { label: '🔄 Recommended Fix', text: 'Provide 5-perspective recommendation plan to fix Chemical Reactor' },
 ];
 
+import { useApp } from '@/lib/AppContext';
+
 export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ isOpen, onClose, onExecuteRollback }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'tech' | 'biz' | 'eng' | 'op'>('simple');
+  const { executeGlobalRollback } = useApp();
+
+  const handleRollbackClick = async () => {
+    if (onExecuteRollback) onExecuteRollback();
+    await executeGlobalRollback('all');
+  };
   const [messages, setMessages] = useState<Array<{
     role: 'user' | 'ai';
     text: string;
@@ -218,7 +226,7 @@ export const AICopilotDrawer: React.FC<AICopilotDrawerProps> = ({ isOpen, onClos
                             <div style={{ fontSize: 12, color: '#E2E8F0', lineHeight: 1.5 }}>{msg.engineerRec}</div>
                             {onExecuteRollback && (
                               <button
-                                onClick={onExecuteRollback}
+                                onClick={handleRollbackClick}
                                 style={{
                                   marginTop: 10, width: '100%', padding: '8px', borderRadius: 8,
                                   background: '#FFB800', color: '#070A0F', fontWeight: 800, fontSize: 11,

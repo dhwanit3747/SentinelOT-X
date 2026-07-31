@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Cpu, CheckCircle2, AlertTriangle, GitCompare, Box } from 'lucide-react';
+import { useApp } from '@/lib/AppContext';
 
 const machines = [
   {
@@ -9,7 +10,7 @@ const machines = [
     name: 'Chemical Reactor Mixer PLC',
     location: 'Plant Alpha — Line 2',
     model: 'Siemens S7-1500',
-    status: 'COMPROMISED',
+    initialStatus: 'COMPROMISED',
     lastChange: '14 mins ago',
     issue: 'Emergency Stop switch disabled in ladder rung 0001.',
     hashMatch: false,
@@ -19,7 +20,7 @@ const machines = [
     name: 'Main Substation Circuit Breaker PLC',
     location: 'Substation Gamma — Grid 1',
     model: 'Schneider M580',
-    status: 'COMPROMISED',
+    initialStatus: 'COMPROMISED',
     lastChange: '28 mins ago',
     issue: 'Breaker trip delay altered from 50ms to 5,000ms.',
     hashMatch: false,
@@ -29,7 +30,7 @@ const machines = [
     name: 'Coolant Flow Controller PLC',
     location: 'Plant Alpha — Line 1',
     model: 'Allen-Bradley ControlLogix',
-    status: 'HEALTHY',
+    initialStatus: 'HEALTHY',
     lastChange: '2 days ago',
     issue: 'None. Operating normally.',
     hashMatch: true,
@@ -39,7 +40,7 @@ const machines = [
     name: 'Turbine Safety Shutdown PLC',
     location: 'Powerhouse Beta',
     model: 'Siemens S7-1200',
-    status: 'HEALTHY',
+    initialStatus: 'HEALTHY',
     lastChange: '5 days ago',
     issue: 'None. Operating normally.',
     hashMatch: true,
@@ -47,6 +48,27 @@ const machines = [
 ];
 
 export default function EngineerFleetView() {
+  const { hasDrift, isRolledBack } = useApp();
+  const isSafe = !hasDrift || isRolledBack;
+
+  const currentMachines = machines.map(m => {
+    if (isSafe) {
+      return {
+        ...m,
+        status: 'HEALTHY',
+        issue: 'None. Operating normally on golden SHA-256 baseline.',
+        hashMatch: true,
+      };
+    }
+    return {
+      ...m,
+      status: m.initialStatus,
+    };
+  });
+
+  const healthyCount = currentMachines.filter(m => m.status === 'HEALTHY').length;
+  const modifiedCount = currentMachines.length - healthyCount;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -64,20 +86,20 @@ export default function EngineerFleetView() {
         {/* Summary Badges */}
         <div style={{ display: 'flex', gap: 10 }}>
           <div style={{ background: '#0F1623', border: '1px solid #1E293B', padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Cpu style={{ width: 15, height: 15, color: '#00F0FF' }} /> Total Machines: 4
+            <Cpu style={{ width: 15, height: 15, color: '#00F0FF' }} /> Total Machines: {currentMachines.length}
           </div>
           <div style={{ background: 'rgba(57,255,20,0.1)', border: '1px solid rgba(57,255,20,0.3)', padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#39FF14', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CheckCircle2 style={{ width: 15, height: 15 }} /> Healthy: 2
+            <CheckCircle2 style={{ width: 15, height: 15 }} /> Healthy: {healthyCount}
           </div>
-          <div style={{ background: 'rgba(255,0,85,0.1)', border: '1px solid rgba(255,0,85,0.3)', padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#FF0055', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <AlertTriangle style={{ width: 15, height: 15 }} /> Modified: 2
+          <div style={{ background: 'rgba(255,0,85,0.1)', border: '1px solid rgba(255,0,85,0.3)', padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700, color: modifiedCount > 0 ? '#FF0055' : '#39FF14', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <AlertTriangle style={{ width: 15, height: 15 }} /> Modified: {modifiedCount}
           </div>
         </div>
       </div>
 
       {/* Grid of Equipment Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-        {machines.map((m) => {
+        {currentMachines.map((m) => {
           const isCompromised = m.status === 'COMPROMISED';
 
           return (
@@ -175,3 +197,4 @@ export default function EngineerFleetView() {
     </div>
   );
 }
+

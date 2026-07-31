@@ -3,10 +3,15 @@ import React, { useState } from 'react';
 import { FileText, Download, Award, ShieldCheck, CheckCircle2, DollarSign, Printer, Sparkles } from 'lucide-react';
 import { JargonTooltip } from '@/components/ui/JargonTooltip';
 
+import { useApp } from '@/lib/AppContext';
+
 export default function ExecutiveReports() {
   const [reportType, setReportType] = useState<'exec' | 'tech' | 'compliance'>('exec');
   const [includeFin, setIncludeFin] = useState(true);
   const [includeDiff, setIncludeDiff] = useState(true);
+  const { hasDrift, isRolledBack } = useApp();
+
+  const isSafe = !hasDrift || isRolledBack;
 
   const [downloadedFile, setDownloadedFile] = useState<string | null>(null);
 
@@ -32,31 +37,27 @@ Verification: STAMP #8F4A21 (Cryptographically Signed & Certified)
 1. INCIDENT & DRIFT SUMMARY
 --------------------------------------------------------------------------------
 - Affected Equipment : Siemens S7-1500 PLC (Chemical Mixer 01)
-- Rogue IP Host     : 192.168.10.99 (Unregistered Engineering Laptop)
-- Threat Signature  : Modbus FC05 Write Coil — Emergency Stop Bit Overridden
-- Safety Risk       : CRITICAL — Physical Floor Emergency Stop Disengaged
-- Status            : UNRESOLVED DRIFT DETECTED
+- Threat Status     : ${isSafe ? 'SAFE — BASELINE VERIFIED (HASH 0x8F4A21)' : 'UNRESOLVED DRIFT DETECTED'}
+- Safety Risk       : ${isSafe ? 'NOMINAL (0 / 100 Risk)' : 'CRITICAL — Physical Floor Emergency Stop Disengaged'}
 
 ${includeFin ? `2. FINANCIAL DOWNTIME IMPACT ANALYSIS
 --------------------------------------------------------------------------------
 - Standard Factory Downtime Rate : $145,000 / hour
-- Estimated Outage Duration     : 6.5 Hours (Safety Interlock Overheat Scenario)
-- Total Projected Downtime Loss  : $942,500
-- IEC 62443 Non-Compliance Fine  : $50,000
+- Estimated Outage Exposure      : ${isSafe ? '$0 USD (Fully Mitigated)' : '$942,500 USD (6.5 Hours Exposure)'}
+- Compliance Pass Score          : ${isSafe ? '100% (Fully Compliant)' : '62.5% (IEC 62443 Violation Flagged)'}
 ` : ''}${includeDiff ? `3. LADDER LOGIC CODE COMPARISON
 --------------------------------------------------------------------------------
 [APPROVED GOLDEN BASELINE — HASH 0x8F4A21]
 Rung 0001: [E_STOP_NC] ---- ( MTR_COIL )
 Status: Interlock active. E-Stop button cuts motor power immediately.
 
-[MODIFIED RUNNING DRIFT — ROGUE IP 192.168.10.99]
-Rung 0001: [ALWAYS_TRUE] ---- ( MTR_COIL ) [UNAPPROVED OVERRIDE]
-Status: E-Stop button bypassed! Motor runs regardless of safety state.
+[RUNNING CODE STATE]
+Rung 0001: ${isSafe ? '[E_STOP_NC] ---- ( MTR_COIL ) [VERIFIED]' : '[ALWAYS_TRUE] ---- ( MTR_COIL ) [UNAPPROVED OVERRIDE]'}
+Status: ${isSafe ? 'Baseline Hash Verified. Emergency stop interlock active.' : 'E-Stop button bypassed! Motor runs regardless of safety state.'}
 ` : ''}4. AI COPILOT RECOMMENDATION & RECOVERY PLAN
 --------------------------------------------------------------------------------
-- Recommended Action : Execute 1-Click Rollback to Hash 0x8F4A21 immediately.
+- Recommended Action : ${isSafe ? 'Baseline hash verified. Continue periodic daily cryptographic auditing.' : 'Execute 1-Click Rollback to Hash 0x8F4A21 immediately.'}
 - Firewall Whitelist  : Block MAC 00:1B:44:11:3A / IP 192.168.10.99.
-- Operator Floor Check: Inspect Chemical Reactor Tank A-102 relief valve manually.
 
 ================================================================================
 End of Certified Report | SentinelOT X AI Security Platform
@@ -237,8 +238,8 @@ End of Certified Report | SentinelOT X AI Security Platform
                     </div>
                     <div style={{ fontSize: 12, color: '#CBD5E1' }}>Estimated production downtime cost @ $145,000 / hr</div>
                   </div>
-                  <div style={{ fontSize: 20, fontWeight: 900, fontFamily: 'monospace', color: '#FF0055' }}>
-                    $942.5k
+                  <div style={{ fontSize: 20, fontWeight: 900, fontFamily: 'monospace', color: isSafe ? '#39FF14' : '#FF0055' }}>
+                    {isSafe ? '$0 (Mitigated)' : '$942.5k'}
                   </div>
                 </div>
               )}
@@ -255,12 +256,14 @@ End of Certified Report | SentinelOT X AI Security Platform
                 </div>
               )}
 
-              <div style={{ background: 'rgba(57,255,20,0.06)', padding: 14, borderRadius: 10, border: '1px solid rgba(57,255,20,0.25)' }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#39FF14', textTransform: 'uppercase', marginBottom: 2 }}>
-                  ACTION RECOMMENDED
+              <div style={{ background: isSafe ? 'rgba(57,255,20,0.06)' : 'rgba(255,0,85,0.06)', padding: 14, borderRadius: 10, border: `1px solid ${isSafe ? 'rgba(57,255,20,0.25)' : 'rgba(255,0,85,0.25)'}` }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: isSafe ? '#39FF14' : '#39FF14', textTransform: 'uppercase', marginBottom: 2 }}>
+                  {isSafe ? '✓ INCIDENT CLOSED — BASELINE VERIFIED' : 'ACTION RECOMMENDED'}
                 </div>
                 <div style={{ fontSize: 12, color: '#E2E8F0' }}>
-                  Execute 1-Click Rollback to restore approved baseline Hash 0x8F4A21 and re-engage safety interlocks.
+                  {isSafe
+                    ? 'Golden baseline SHA-256 Hash 0x8F4A21 verified across all fleet PLCs. Safety interlocks active.'
+                    : 'Execute 1-Click Rollback to restore approved baseline Hash 0x8F4A21 and re-engage safety interlocks.'}
                 </div>
               </div>
             </div>

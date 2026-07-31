@@ -6,12 +6,12 @@ import { useApp } from '@/lib/AppContext';
 
 export default function LogicDiffViewer() {
   const [viewMode, setViewMode] = useState<'plain' | 'ladder'>('plain');
-  const [restored, setRestored] = useState(false);
-  const { setHasDrift } = useApp();
+  const { hasDrift, isRolledBack, executeGlobalRollback } = useApp();
 
-  const handleRollback = () => {
-    setRestored(true);
-    setHasDrift(false);
+  const restored = !hasDrift || isRolledBack;
+
+  const handleRollback = async () => {
+    await executeGlobalRollback('all');
     alert('✅ ONE-CLICK ROLLBACK COMPLETED: Siemens S7-1500 restored to approved golden baseline Hash 0x8F4A21. DRIFT badge cleared.');
   };
 

@@ -46,23 +46,38 @@ const rules = [
   },
 ];
 
+import { useApp } from '@/lib/AppContext';
+
 export default function ComplianceFramework() {
   const [ruleList, setRuleList] = useState(rules);
-  const [allFixed, setAllFixed] = useState(false);
+  const { hasDrift, isRolledBack, executeGlobalRollback } = useApp();
 
-  const handleFixRule = (id: string) => {
+  const isSafe = !hasDrift || isRolledBack;
+
+  const currentRules = ruleList.map(r => {
+    if (isSafe) {
+      return { ...r, status: 'PASSED', penalty: '$0 (Compliant)', issue: 'Violation remediated. Baseline verified.' };
+    }
+    return r;
+  });
+
+  const handleFixRule = async (id: string) => {
     setRuleList(p => p.map(r => r.id === id ? { ...r, status: 'PASSED', penalty: '$0 (Compliant)', issue: 'Violation remediated. Baseline verified.' } : r));
+    const remainingFailed = currentRules.filter(r => r.id !== id && r.status === 'FAILED').length;
+    if (remainingFailed === 0) {
+      await executeGlobalRollback('all');
+    }
     alert(`Rule ${id} violation fixed! Compliance restored.`);
   };
 
-  const handleFixAll = () => {
-    setAllFixed(true);
+  const handleFixAll = async () => {
+    await executeGlobalRollback('all');
     setRuleList(p => p.map(r => ({ ...r, status: 'PASSED', penalty: '$0 (Compliant)', issue: 'Violation remediated. Baseline verified.' })));
     alert('ALL SAFETY VIOLATIONS REMEDIATED: Compliance score restored to 100%!');
   };
 
-  const failedCount = ruleList.filter(r => r.status === 'FAILED').length;
-  const passRate = (((ruleList.length - failedCount) / ruleList.length) * 100).toFixed(1);
+  const failedCount = currentRules.filter(r => r.status === 'FAILED').length;
+  const passRate = (((currentRules.length - failedCount) / currentRules.length) * 100).toFixed(1);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -112,7 +127,7 @@ export default function ComplianceFramework() {
 
       {/* Rule Cards List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {ruleList.map((r) => {
+        {currentRules.map((r) => {
           const isFailed = r.status === 'FAILED';
 
           return (

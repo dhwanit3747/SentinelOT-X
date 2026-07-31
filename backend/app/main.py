@@ -171,11 +171,35 @@ class Handler(BaseHTTPRequestHandler):
             diff['plc_id'] = plc_id
             state = PLC_RUNTIME_STATES.get(plc_id, {})
             diff['current_hash'] = state.get('current_hash', diff['current_hash'])
+            if not state.get('drift_detected', True):
+                diff['modified_rungs_count'] = 0
+                diff['added_rungs_count'] = 0
+                diff['rungs_diff'] = []
+                diff['overall_safety_hazard'] = "OPERATIONAL - SAFE BASELINE MATCH"
+                diff['root_cause_summary'] = "All PLC ladder logic rungs match golden SHA-256 baseline."
             self._json(diff)
 
         elif '/api/v1/plcs/' in p and p.endswith('/risk'):
             plc_id = p.split('/')[4]
-            self._json({**MOCK_RISK, 'plc_id': plc_id})
+            state = PLC_RUNTIME_STATES.get(plc_id, {})
+            if not state.get('drift_detected', True):
+                self._json({
+                    'plc_id': plc_id,
+                    'overall_risk_score': 0.0,
+                    'risk_level': 'LOW',
+                    'confidentiality_impact': 0.0,
+                    'integrity_impact': 0.0,
+                    'availability_impact': 0.0,
+                    'safety_hazard_index': 0.0,
+                    'financial_impact_per_hour': 0.0,
+                    'estimated_downtime_hours': 0.0,
+                    'explainability_factors': [
+                        'All rungs verified against golden baseline Hash 0x8F4A21',
+                        'Safety interlocks active and nominal'
+                    ]
+                })
+            else:
+                self._json({**MOCK_RISK, 'plc_id': plc_id})
 
         elif '/api/v1/plcs/' in p:
             plc_id = p.split('/')[4]
@@ -193,8 +217,10 @@ class Handler(BaseHTTPRequestHandler):
             state = PLC_RUNTIME_STATES.get(plc_id, {})
             if not state.get('drift_detected', True):
                 twin['status'] = 'OPERATIONAL'
+                twin['system_health_pct'] = 100.0
                 twin['current_pressure_psi'] = 72.5
                 twin['current_temp_c'] = 65.0
+                twin['pump_flow_rate_lpm'] = 45.0
                 twin['valve_open_pct'] = 45.0
                 twin['active_anomaly'] = None
             self._json(twin)
@@ -204,14 +230,34 @@ class Handler(BaseHTTPRequestHandler):
             self._json(MOCK_UEBA)
 
         elif p == '/api/v1/drift/compliance':
-            self._json(MOCK_COMPLIANCE)
+            any_drift = any(s.get('drift_detected', False) for s in PLC_RUNTIME_STATES.values())
+            if not any_drift:
+                compliant_list = [dict(c, status='PASS', details='Compliant — Golden baseline verified.') for c in MOCK_COMPLIANCE]
+                self._json(compliant_list)
+            else:
+                self._json(MOCK_COMPLIANCE)
 
         elif p == '/api/v1/drift/alerts':
-            self._json(MOCK_ALERTS)
+            any_drift = any(s.get('drift_detected', False) for s in PLC_RUNTIME_STATES.values())
+            if not any_drift:
+                self._json([])
+            else:
+                self._json(MOCK_ALERTS)
 
         # ── Reports ───────────────────────────────
         elif p == '/api/v1/reports/summary':
-            self._json(MOCK_REPORT)
+            any_drift = any(s.get('drift_detected', False) for s in PLC_RUNTIME_STATES.values())
+            if not any_drift:
+                self._json({
+                    **MOCK_REPORT,
+                    "total_drifts_detected": 0,
+                    "overall_posture_score": 100.0,
+                    "projected_financial_risk_usd": 0.0,
+                    "compliance_score_pct": 100.0,
+                    "key_findings": ["All fleet PLCs running verified golden SHA-256 baselines.", "Zero unapproved logic changes."]
+                })
+            else:
+                self._json(MOCK_REPORT)
 
         # ── Health / Root ─────────────────────────
         elif p in ('', '/'):
@@ -232,10 +278,27 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             body = {}
 
-        # ── Rollback ──────────────────────────────
-        if '/rollback' in p and '/api/v1/plcs/' in p:
+        # ── Rollback All ──────────────────────────
+        if p == '/api/v1/plcs/rollback-all':
+            for state in PLC_RUNTIME_STATES.values():
+                state['current_hash'] = state['baseline_hash']
+                state['drift_detected'] = False
+                state['status'] = 'OPERATIONAL'
+            self._json({
+                "success": True,
+                "message": "Global One-Click Rollback executed. All fleet PLCs restored to golden baseline SHA-256 signatures.",
+                "new_status": "OPERATIONAL"
+            })
+
+        # ── Rollback Single ────────────────────────
+        elif '/rollback' in p and '/api/v1/plcs/' in p:
             plc_id = p.split('/')[4]
-            if plc_id in PLC_RUNTIME_STATES:
+            if plc_id == 'all':
+                for state in PLC_RUNTIME_STATES.values():
+                    state['current_hash'] = state['baseline_hash']
+                    state['drift_detected'] = False
+                    state['status'] = 'OPERATIONAL'
+            elif plc_id in PLC_RUNTIME_STATES:
                 state = PLC_RUNTIME_STATES[plc_id]
                 state['current_hash'] = state['baseline_hash']
                 state['drift_detected'] = False
